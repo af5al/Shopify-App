@@ -1,20 +1,35 @@
+// web/shopify.js
+
 import { BillingInterval, LATEST_API_VERSION } from "@shopify/shopify-api";
 import { shopifyApp } from "@shopify/shopify-app-express";
-import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlite";
+// Remove SQLite import
+// import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlite";
+import { MongoDBSessionStorage } from "@shopify/shopify-app-session-storage-mongodb";
 import { restResources } from "@shopify/shopify-api/rest/admin/2024-10";
 
-const DB_PATH = `${process.cwd()}/database.sqlite`;
+// We no longer use a local SQLite file:
+// const DB_PATH = `${process.cwd()}/database.sqlite`;
 
-// The transactions with Shopify will always be marked as test transactions, unless NODE_ENV is production.
-// See the ensureBilling helper to learn more about billing in this template.
+// Example billing config (unchanged)
 const billingConfig = {
   "My Shopify One-Time Charge": {
-    // This is an example configuration that would do a one-time charge for $5 (only USD is currently supported)
     amount: 5.0,
     currencyCode: "USD",
     interval: BillingInterval.OneTime,
   },
 };
+
+// Create MongoDB-based session storage
+// Using MONGO_URI from .env and a database name "shopify_app"
+const sessionStorage = new MongoDBSessionStorage(
+  // process.env.MONGO_URI || 
+  'mongodb+srv://mohdafsal1049_db_user:euMWSBPbRZ2F4hOp@cluster0.aavty1f.mongodb.net/?appName=Cluster0',
+  "shopify_app",                    // database name
+  {
+    // optional: override default collection name
+    // collectionName: "shopify_sessions",
+  }
+);
 
 const shopify = shopifyApp({
   api: {
@@ -25,7 +40,7 @@ const shopify = shopifyApp({
       lineItemBilling: true,
       unstable_managedPricingSupport: true,
     },
-    billing: undefined, // or replace with billingConfig above to enable example billing
+    billing: undefined, // or billingConfig if you want billing
   },
   auth: {
     path: "/api/auth",
@@ -34,8 +49,8 @@ const shopify = shopifyApp({
   webhooks: {
     path: "/api/webhooks",
   },
-  // This should be replaced with your preferred storage strategy
-  sessionStorage: new SQLiteSessionStorage(DB_PATH),
+  // Use MongoDB session storage instead of SQLite
+  sessionStorage,
 });
 
 export default shopify;
