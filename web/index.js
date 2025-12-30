@@ -9,6 +9,7 @@ import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import PrivacyWebhookHandlers from "./privacy.js";
 import { connectMongo } from "./mongo.js"; // <-- NEW: Mongo connection helper
+import routes from "./routes/index.js";
 
 const PORT = parseInt(
   process.env.BACKEND_PORT || process.env.PORT || "3000",
@@ -76,6 +77,8 @@ async function startServer() {
 
     res.status(status).send({ success: status === 200, error });
   });
+
+  app.use("/api/v1", routes);
 
   app.use(shopify.cspHeaders());
   app.use(serveStatic(STATIC_PATH, { index: false }));

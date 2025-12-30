@@ -19,7 +19,7 @@ export default function App() {
         <QueryProvider>
           <NavMenu>
             <a href="/" rel="home" />
-            <a href="/pagename">{t("NavigationMenu.pageName")}</a>
+            <a href="/countdowntimer">{t("NavigationMenu.countDownTimer")}</a>
           </NavMenu>
           <Routes pages={pages} />
         </QueryProvider>
