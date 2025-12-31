@@ -1,6 +1,7 @@
 // web/routes/storefronttimer.routes.js
 import express from "express";
 import { findActiveTimerForProduct } from "../services/timer.service.js";
+import { HTTPSTATUS } from "../constants/httpstatus.js";
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.get("/", async (req, res) => {
       return res.json({ active: false });
     }
 
-    res.json({
+    res.status(HTTPSTATUS.OK).json({
       active: true,
       id: timer._id,
       type: timer.type,
@@ -33,6 +34,9 @@ router.get("/", async (req, res) => {
       endAt: timer.endAt,
       durationSeconds: timer.durationSeconds,
       targeting: timer.targeting,
+      appearance: timer.appearance,
+      urgency: timer.urgency,
+      description: timer.description || "",
     });
   } catch (err) {
     console.error("Error in storefrontTimerRoutes:", err);

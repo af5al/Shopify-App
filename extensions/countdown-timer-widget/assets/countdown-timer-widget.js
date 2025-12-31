@@ -11,7 +11,7 @@
 
       var productId = el.getAttribute("data-product-id");
       var showLabel = el.dataset.showLabel === "true";
-      var labelText = el.dataset.labelText || "";
+      var labelText = "ends in:";
 
       fetch("/apps/countdown-timer?product_id=" + productId)
         .then(function (res) {
@@ -26,7 +26,11 @@
             return;
           }
 
-          renderTimer(el, timer, showLabel, labelText);
+          if (timer.active === false) {
+            el.innerHTML = "No active promotions";
+          } else {
+            renderTimer(el, timer, showLabel, labelText);
+          }
         })
         .catch(function (err) {
           console.error("[CountdownTimerWidget] fetch error", err);
@@ -42,10 +46,13 @@
     var bg =
       (timer.appearance && timer.appearance.backgroundColor) || "#f4f6f8";
 
+    const label = timer.name ? `${timer.name} ${labelText}` : labelText;
+
     container.innerHTML = `
       <div class="countdown-timer-box" style="background:${bg}; padding:10px; text-align:center;">
-        ${showLabel ? `<div class="countdown-label">${labelText}</div>` : ""}
+        ${showLabel ? `<div class="countdown-label">${label}</div>` : ""}
         <div class="countdown-time" id="countdown-${timerId}">--:--:--</div>
+        <p style="font-size:12px; color:#666; margin-top:10px;">${timer.description}</p>
       </div>
     `;
 
