@@ -151,58 +151,59 @@ export async function findActiveTimerForProduct({ shop, productId }) {
 
   // Fetch all timers for this shop. You can optimize later with more specific queries.
   const timers = await Timer.find({ shop }).lean();
-  // console.log('timers fetched in controller', timers);
+  console.log('timers fetched in controller', timers);
 
 
-  for (const timer of timers) {
-    // 1) Check time window
-    if (!isTimerInTimeWindow(timer, now)) {
-      continue;
-    }
+  // for (const timer of timers) {
+  //   // 1) Check time window
+  //   if (!isTimerInTimeWindow(timer, now)) {
+  //     continue;
+  //   }
 
-    // 2) Check targeting
-    if (!doesTimerTargetProduct(timer, normalizedProductId)) {
-      continue;
-    }
+  //   // 2) Check targeting
+  //   if (!doesTimerTargetProduct(timer, normalizedProductId)) {
+  //     continue;
+  //   }
 
-    // First match wins. You can change this to choose highest priority, etc.
-    return timer;
-  }
+  //   // First match wins. You can change this to choose highest priority, etc.
+  //   return timer;
+  // }
 
-  return null;
+  return timers[0] || null;
 }
 
-function isTimerInTimeWindow(timer, now) {
-  if (!timer || !timer.type) return false;
+// function isTimerInTimeWindow(timer, now) {
+//   if (!timer || !timer.type) return false;
 
-  if (timer.type === "fixed") {
-    if (timer.startAt && now < timer.startAt) return false;
-    if (timer.endAt && now > timer.endAt) return false;
-    return true;
-  }
+//   console.log('Checking timer time window', now < timer.startAt, now > timer.endAt);
+//   if (timer.type === "fixed") {
+//     if (timer.startAt && now < timer.startAt)return false;
+//     if (timer.endAt && now > timer.endAt) return false;
+//     return true;
+//   }
 
-  if (timer.type === "evergreen") {
-    return true;
-  }
+//   if (timer.type === "evergreen") {
+//     return true;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
-function doesTimerTargetProduct(timer, normalizedProductId) {
-  const targeting = timer.targeting || { type: "all" };
+// function doesTimerTargetProduct(timer, normalizedProductId) {
+//   const targeting = timer.targeting || { type: "all" };
 
-  if (!targeting.type || targeting.type === "all") {
-    return true;
-  }
+//   if (!targeting.type || targeting.type === "all") {
+//     return true;
+//   }
 
-  if (targeting.type === "products") {
-    const ids = targeting.productIds || [];
-    return ids.includes(normalizedProductId);
-  }
+//   if (targeting.type === "products") {
+//     const ids = targeting.productIds || [];
+//     return ids.includes(normalizedProductId);
+//   }
 
-  if (targeting.type === "collections") {
-    return false;
-  }
+//   if (targeting.type === "collections") {
+//     return false;
+//   }
 
-  return false;
-}
+//   return false;
+// }

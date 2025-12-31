@@ -1,4 +1,3 @@
-// web/frontend/pages/CountdownTimerForm.jsx
 import { useEffect, useState, useCallback } from "react";
 import {
   Page,
@@ -13,62 +12,38 @@ import {
   Text,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function CountdownTimerForm() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const location = useLocation();
+  const id = location.state?.id;
+  console.log('id', id);
   const isEdit = Boolean(id);
-
-  /* ===============================
-     PAGE STATES
-  =============================== */
+ 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-
-  /* ===============================
-     BASIC INFO
-  =============================== */
   const [name, setName] = useState("");
   const [type, setType] = useState("fixed");
   const [startAt, setStartAt] = useState("");
   const [endAt, setEndAt] = useState("");
   const [durationSeconds, setDurationSeconds] = useState("");
-
   const [description, setDescription] = useState("");
-
-  /* ===============================
-     APPEARANCE
-  =============================== */
   const [backgroundColor, setBackgroundColor] = useState("#A3E635");
   const [timerSize, setTimerSize] = useState("medium");
   const [timerPosition, setTimerPosition] = useState("top");
-
-  /* ===============================
-     URGENCY
-  =============================== */
   const [urgencyType, setUrgencyType] = useState("pulse");
-
-  /* ===============================
-     TARGETING
-  =============================== */
   const [targetingType, setTargetingType] = useState("all");
   const [productIds, setProductIds] = useState("");
   const [collectionIds, setCollectionIds] = useState("");
 
-  /* ===============================
-     INITIAL STATE (RESET)
-  =============================== */
   const [initialState, setInitialState] = useState(null);
 
   const captureInitialState = useCallback((data) => {
     setInitialState(data);
   }, []);
 
-  /* ===============================
-     LOAD TIMER (EDIT MODE)
-  =============================== */
   const loadTimer = useCallback(async () => {
     if (!isEdit) {
       captureInitialState({
@@ -89,9 +64,16 @@ export default function CountdownTimerForm() {
       return;
     }
 
+    console.log('isedit', isEdit);
     try {
       setLoading(true);
-      const res = await fetch(`/api/v1/timers/${id}`);
+      const res = await fetch(
+        `/api/v1/timers?id=${id}`,
+        {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        },
+      );
       if (!res.ok) throw new Error("Failed to load timer");
 
       const timer = await res.json();
@@ -183,7 +165,7 @@ export default function CountdownTimerForm() {
 
     try {
       const res = await fetch(
-        isEdit ? `/api/timers/v1/${id}` : "/api/v1/timers",
+        isEdit ? `/api/v1/timers?id=${id}` : "/api/v1/timers",
         {
           method: isEdit ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -201,13 +183,10 @@ export default function CountdownTimerForm() {
     }
   };
 
-  /* ===============================
-     RESET
-  =============================== */
-  const handleReset = () => {
+const handleReset = () => {
     if (!initialState) return;
     Object.entries(initialState).forEach(([key, value]) => {
-      const setters = {
+    const setters = {
         name: setName,
         type: setType,
         startAt: setStartAt,
@@ -221,16 +200,13 @@ export default function CountdownTimerForm() {
         targetingType: setTargetingType,
         productIds: setProductIds,
         collectionIds: setCollectionIds,
-      };
-      setters[key]?.(value);
+    };
+    setters[key]?.(value);
     });
   };
 
   const title = isEdit ? "Edit countdown timer" : "Create countdown timer";
 
-  /* ===============================
-     RENDER
-  =============================== */
   return (
     <Frame>
       <Page

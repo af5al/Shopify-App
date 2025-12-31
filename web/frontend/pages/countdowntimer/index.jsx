@@ -1,32 +1,31 @@
-import {useEffect, useState, useCallback} from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Page,
   Layout,
   Card,
-  TextContainer,
   Text,
   DataTable,
   Spinner,
   Stack,
   Badge,
+  Button,
 } from "@shopify/polaris";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { TitleBar } from "@shopify/app-bridge-react";
 
 export default function CountdownTimerIndex() {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
   const [timers, setTimers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate()
 
   const loadTimers = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/v1/timers");
-      if (!res.ok) {
-        throw new Error("Failed to load timers");
-      }
+      if (!res.ok) throw new Error("Failed to load timers");
       const result = await res.json();
       setTimers(result?.data || []);
     } catch (error) {
@@ -40,6 +39,21 @@ export default function CountdownTimerIndex() {
     loadTimers();
   }, [loadTimers]);
 
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to delete this timer?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/v1/timers?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      loadTimers();
+    } catch (error) {
+      console.error("Error deleting timer:", error);
+    }
+  };
+
   const rows = timers.map((timer) => {
     const typeLabel = timer.type === "fixed" ? "Fixed" : "Evergreen";
 
@@ -48,7 +62,7 @@ export default function CountdownTimerIndex() {
     if (targetingType === "products") {
       targetingLabel = `Products (${timer.targeting?.productIds?.length || 0})`;
     } else if (targetingType === "collections") {
-      targetingLabel = `Collections(${timer.targeting?.collectionIds?.length || 0})`;
+      targetingLabel = `Collections (${timer.targeting?.collectionIds?.length || 0})`;
     }
 
     const schedule =
@@ -62,37 +76,48 @@ export default function CountdownTimerIndex() {
 
     return [
       timer.name || "-",
+
       <Badge key={`${timer._id}-type`} tone="info">
         {typeLabel}
       </Badge>,
+
       targetingLabel,
       schedule,
       timer.impressions ?? 0,
+
+      <Stack gap="200" key={`${timer._id}-actions`}>
+        <Button
+          size="slim"
+          onClick={() => navigate(`/countdowntimer/form`, { state: { id: timer._id } })}
+        >
+          Edit
+        </Button>
+        <Button
+          size="slim"
+          tone="critical"
+          onClick={() => handleDelete(timer._id)}
+        >
+          Delete
+        </Button>
+      </Stack>,
     ];
   });
 
   return (
     <Page
-      title={t("CountdownTimerPage.CountDownTimersListTitle")}
+      title={t("CountdownTimerPage.title", "Countdown timers")}
       primaryAction={{
         content: t("CountdownTimerPage.createAction", "Create timer"),
-        onAction: () => {
-          navigate("/countdowntimer/create");
-        },
+        onAction: () => navigate("/countdowntimer/form"),
       }}
-      narrowWidth
     >
       <TitleBar title={t("CountdownTimerPage.title", "Countdown timers")} />
 
       <Layout>
         <Layout.Section>
-          {/* filters */}
-        </Layout.Section>
-
-        <Layout.Section>
           <Card>
             {loading ? (
-              <div style={{padding: "1rem"}}>
+              <div style={{ padding: "1rem" }}>
                 <Stack align="center" blockAlign="center">
                   <Spinner
                     accessibilityLabel="Loading countdown timers"
@@ -101,43 +126,33 @@ export default function CountdownTimerIndex() {
                 </Stack>
               </div>
             ) : timers.length === 0 ? (
-              <div style={{padding: "1rem"}}>
+              <div style={{ padding: "1rem" }}>
                 <Text as="p" variant="bodyMd">
-                  {t(
-                    "CountdownTimerPage.emptyState",
-                    "No Timers found"
-                  )}
+                  {t("CountdownTimerPage.emptyState", "No timers found")}
                 </Text>
-                {/* <Button
-                  primary
-                  onClick={() => {
-                    alert("Create timer form not implemented yet");
-                  }}
-                >
-                  {t(
-                    "CountdownTimerPage.createFirst",
-                    "Create your first timer"
-                  )}
-                </Button> */}
               </div>
             ) : (
-              <DataTable
-                columnContentTypes={[
-                  "text",   // Name
-                  "text",   // Type
-                  "text",   // Targeting
-                  "text",   // Schedule
-                  "numeric" // Impressions
-                ]}
-                headings={[
-                  t("CountdownTimerPage.columns.name", "Name"),
-                  t("CountdownTimerPage.columns.type", "Type"),
-                  t("CountdownTimerPage.columns.targeting", "Targeting"),
-                  t("CountdownTimerPage.columns.schedule", "Schedule"),
-                  t("CountdownTimerPage.columns.impressions", "Impressions"),
-                ]}
-                rows={rows}
-              />
+              <div style={{ overflowX: "auto" }}>
+                <DataTable
+                  columnContentTypes={[
+                    "text",    // Name
+                    "text",    // Type
+                    "text",    // Targeting
+                    "text",    // Schedule
+                    "numeric", // Impressions
+                    "text",    // Actions
+                  ]}
+                  headings={[
+                    t("CountdownTimerPage.columns.name", "Name"),
+                    t("CountdownTimerPage.columns.type", "Type"),
+                    t("CountdownTimerPage.columns.targeting", "Targeting"),
+                    t("CountdownTimerPage.columns.schedule", "Schedule"),
+                    t("CountdownTimerPage.columns.impressions", "Impressions"),
+                    "Actions",
+                  ]}
+                  rows={rows}
+                />
+              </div>
             )}
           </Card>
         </Layout.Section>

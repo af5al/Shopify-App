@@ -43,9 +43,26 @@ export const list = asyncHandler(async (req, res) => {
 
 export const getOne = asyncHandler(async (req, res) => {
     const shop = res.locals.shopify.session.shop;
-    const { id } = req.params;
+    const { id } = req.query;
 
-    const timer = await getTimerById(shop, id);
+    let timer;
+    if(!id){
+        const {
+            page = '1',
+            limit = '10',
+            sortBy = 'createdAt',
+            sortOrder = 'desc',
+        } = req.query;
+        timer = await listTimers({
+            shop,
+            page: Math.max(1, parseInt(page, 10)),
+            limit: Math.min(100, parseInt(limit, 10)),
+            sortBy,
+            sortOrder,
+        });
+    } else {
+        timer = await getTimerById(shop, id);
+    }
 
     if (!timer) {
         res.status(HTTPSTATUS.NOT_FOUND).json({ message: 'Timer not found' });
@@ -57,7 +74,7 @@ export const getOne = asyncHandler(async (req, res) => {
 
 export const update = asyncHandler(async (req, res) => {
     const shop = res.locals.shopify.session.shop;
-    const { id } = req.params;
+    const { id } = req.query;
 
     const timer = await updateTimer(shop, id, req.body);
 
@@ -74,7 +91,7 @@ export const update = asyncHandler(async (req, res) => {
 
 export const destroy = asyncHandler(async (req, res) => {
     const shop = res.locals.shopify.session.shop;
-    const { id } = req.params;
+    const { id } = req.query;
 
     const timer = await deleteTimer(shop, id);
 
