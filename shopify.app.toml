@@ -18,3 +18,8 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [ "https://example.com/api/auth" ]
+
+[app_proxy]
+url = "https://paintings-lots-literary-projection.trycloudflare.com"
+prefix = "apps"
+subpath = "countdown-timer"

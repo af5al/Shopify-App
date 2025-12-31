@@ -90,6 +90,7 @@ export const destroy = asyncHandler(async (req, res) => {
 
 export const getStorefrontTimer = asyncHandler(async (req, res) => {
     const shop = res.locals.shopify.session.shop;
+    console.log('shopppp', shop);
     const { productId, collectionIds } = req.query;
 
     if (!productId) {

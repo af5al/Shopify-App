@@ -1,0 +1,58 @@
+{% schema %}
+{
+  "name": "Countdown timer",
+  "target": "section",
+  "templates": ["product"],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "Show label above timer",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "label_text",
+      "label": "Label text",
+      "default": "Limited-time offer ends in:"
+    }
+  ]
+}
+{% endschema %}
+
+<div
+  class="countdown-timer-app"
+  data-product-id="{{ product.id }}"
+  data-show-label="{{ block.settings.show_label }}"
+  data-label-text="{{ block.settings.label_text | escape }}"
+>
+  <span class="countdown-timer-placeholder">Loading countdown…</span>
+</div>
+
+<script src="{{ 'countdown-timer-widget.js' | asset_url }}" defer></script>
+
+<style>
+  .countdown-timer-app {
+    display: inline-block;
+    min-height: 48px;
+  }
+
+  .countdown-timer-placeholder {
+    font-size: 0.875rem;
+    opacity: 0.6;
+  }
+
+  .countdown-timer-box {
+    border-radius: 6px;
+  }
+
+  .countdown-label {
+    font-size: 0.875rem;
+    margin-bottom: 4px;
+  }
+
+  .countdown-time {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+</style>

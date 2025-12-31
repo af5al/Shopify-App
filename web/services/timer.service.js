@@ -130,3 +130,79 @@ export const getActiveTimerForProduct = async ({
 
   return timer;
 };
+
+
+function normalizeProductId(rawId) {
+  if (!rawId) return null;
+  const str = String(rawId);
+
+  // Extract last sequence of digits
+  const match = str.match(/\d+$/);
+  return match ? match[0] : str;
+}
+
+export async function findActiveTimerForProduct({ shop, productId }) {
+  const now = new Date();
+  const normalizedProductId = normalizeProductId(productId);
+
+  if (!shop || !normalizedProductId) {
+    return null;
+  }
+
+  // Fetch all timers for this shop. You can optimize later with more specific queries.
+  const timers = await Timer.find({ shop }).lean();
+  // console.log('timers fetched in controller', timers);
+
+
+  for (const timer of timers) {
+    // 1) Check time window
+    if (!isTimerInTimeWindow(timer, now)) {
+      continue;
+    }
+
+    // 2) Check targeting
+    if (!doesTimerTargetProduct(timer, normalizedProductId)) {
+      continue;
+    }
+
+    // First match wins. You can change this to choose highest priority, etc.
+    return timer;
+  }
+
+  return null;
+}
+
+function isTimerInTimeWindow(timer, now) {
+  if (!timer || !timer.type) return false;
+
+  if (timer.type === "fixed") {
+    if (timer.startAt && now < timer.startAt) return false;
+    if (timer.endAt && now > timer.endAt) return false;
+    return true;
+  }
+
+  if (timer.type === "evergreen") {
+    return true;
+  }
+
+  return false;
+}
+
+function doesTimerTargetProduct(timer, normalizedProductId) {
+  const targeting = timer.targeting || { type: "all" };
+
+  if (!targeting.type || targeting.type === "all") {
+    return true;
+  }
+
+  if (targeting.type === "products") {
+    const ids = targeting.productIds || [];
+    return ids.includes(normalizedProductId);
+  }
+
+  if (targeting.type === "collections") {
+    return false;
+  }
+
+  return false;
+}
