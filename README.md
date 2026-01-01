@@ -38,11 +38,6 @@ embedded = true
    Open a Product Page
    Enable the Countdown Timer App Block
 
-8. temporary code fix for working of shopify app timer crud pages and api ‼️‼️‼️
-
--   inside ./web/index.js, comment 'app.use("/", storefrontTimerRoutes);' to work timer crud operation.
--   uncomment it when going to see timer widget in product page in the store (the error is due to routes clash with ensure ensureInstalledOnShop app level middleware, fixing is on the way)
-
 App is now running inside Shopify Admin.
 
 # store access to view product page with timer

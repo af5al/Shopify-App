@@ -41,7 +41,7 @@ async function startServer() {
   );
 
   console.log("Registering storefront timer routes at /apps/countdown-timer");
-  app.use("/", storefrontTimerRoutes); // comment this to work admin timer routes and uncomment while on product page to see widget in products page
+  app.use("/", storefrontTimerRoutes);
 
   // If you are adding routes outside of the /api path, remember to
   // also add a proxy rule for them in web/frontend/vite.config.js
