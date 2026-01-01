@@ -1,5 +1,5 @@
 // web/shopify.js
-
+import "dotenv/config"; // Load .env file
 import { BillingInterval, LATEST_API_VERSION } from "@shopify/shopify-api";
 import { shopifyApp } from "@shopify/shopify-app-express";
 // Remove SQLite import
@@ -22,8 +22,7 @@ const billingConfig = {
 // Create MongoDB-based session storage
 // Using MONGO_URI from .env and a database name "shopify_app"
 const sessionStorage = new MongoDBSessionStorage(
-  // process.env.MONGO_URI || 
-  'mongodb+srv://mohdafsal1049_db_user:euMWSBPbRZ2F4hOp@cluster0.aavty1f.mongodb.net/?appName=Cluster0',
+  process.env.MONGO_URI,
   "shopify_app",                    // database name
   {
     // optional: override default collection name

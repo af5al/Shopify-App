@@ -6,11 +6,9 @@ import {
     getTimerById,
     updateTimer,
     deleteTimer,
-    getActiveTimerForProduct,
 } from '../services/timer.service.js';
 
 export const create = asyncHandler(async (req, res) => {
-    // const shop = req.shop; // injected by Shopify auth middleware
     const shop = res.locals.shopify.session.shop;
     const timer = await createTimer(shop, req.body);
 
@@ -102,29 +100,5 @@ export const destroy = asyncHandler(async (req, res) => {
 
     res.status(HTTPSTATUS.OK).json({
         message: 'Timer deleted successfully',
-    });
-});
-
-export const getStorefrontTimer = asyncHandler(async (req, res) => {
-    const shop = res.locals.shopify.session.shop;
-    console.log('shopppp', shop);
-    const { productId, collectionIds } = req.query;
-
-    if (!productId) {
-        res.status(HTTPSTATUS.BAD_REQUEST).json({
-            message: 'productId is required',
-        });
-        return;
-    }
-
-    const timer = await getActiveTimerForProduct({
-        shop,
-        productId,
-        collectionIds:
-            typeof collectionIds === 'string' ? collectionIds.split(',') : [],
-    });
-
-    res.status(HTTPSTATUS.OK).json({
-        data: timer,
     });
 });

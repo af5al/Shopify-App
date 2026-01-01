@@ -20,7 +20,7 @@
         .then(function (response) {
           console.log("[CountdownTimerWidget] response", response);
 
-          var timer = response;
+          var timer = response?.data;
           if (!timer) {
             el.innerHTML = "";
             return;
