@@ -1,19 +1,49 @@
-# To start shopify admin/merchant app - Setup Instructions
+Shopify Admin App – Setup Instructions
 
-### Prerequisites
-- Node.js 18+
-- Shopify CLI
-- Shopify Partners account
+Prerequisites:
 
-### Steps
+Node.js v18 or higher
+Shopify CLI
+Shopify Partner account
+MongoDB Atlas
+
+Setup Steps:
+
 1. Clone the repository
-2. Run `npm install`
-3. Create a Shopify app using Shopify CLI
-4. Copy API key & secret into `.env`
-5. Create a development store
-6. Run `shopify app dev`
-7. Install the app on the dev store
-8. Enable the Countdown Timer app block on product page
+   git clone <repository-url>
+   cd <project-folder>
+
+2. Install dependencies
+   npm install
+
+3. Create Shopify app and store from https://dev.shopify.com/dashboard
+
+4. Copy Client ID, App Name, and Application URL
+   Update .shopify.app.toml file
+
+client_id = "<YOUR_CLIENT_ID>"
+name = "Admin-app"
+application_url = "https://<your-app-url>"
+embedded = true
+
+5. Add environment variables
+   Create a .env file inside the web folder and add:
+   MONGO_URI=<your_mongodb_connection_string>
+
+6. Start the app
+   shopify app dev
+
+7. Enable the app block
+   Go to Online Store → Themes → Customize
+   Open a Product Page
+   Enable the Countdown Timer App Block
+
+8. temporary code fix for working of shopify app timer crud pages and api ‼️‼️‼️
+
+-   inside ./web/index.js, comment 'app.use("/", storefrontTimerRoutes);' to work timer crud operation.
+-   uncomment it when going to see timer widget in product page in the store (the error is due to routes clash with ensure ensureInstalledOnShop app level middleware, fixing is on the way)
+
+App is now running inside Shopify Admin.
 
 # store access to view product page with timer
 
@@ -22,23 +52,21 @@
 -there you can see the timer widget i have given on every single product view
 
 # Project Structure
+
 .
 ├── web/
-│   ├── index.js                # Express server entry
-│   ├── routes/                 # Admin & storefront routes
-│   ├── models/                 # MongoDB models
-|   |__ .env.sample/            # .env.sample
-│   └── frontend/               # React admin UI
+│ ├── index.js # Express server entry
+│ ├── routes/ # Admin & storefront routes
+│ ├── models/ # MongoDB models
+| |\_\_ .env.sample/ # .env.sample
+│ └── frontend/ # React admin UI
 │
 ├── extensions/
-│   └── countdown-timer-widget/
-│       ├── blocks/
-│       │   └── countdown-timer.liquid
-│       └── assets/
-│           └── countdown-timer-widget.js
+│ └── countdown-timer-widget/
+│ ├── blocks/
+│ │ └── countdown-timer.liquid
+│ └── assets/
+│ └── countdown-timer-widget.js
 │
 ├── shopify.app.toml
 └── README.md
-
-
-

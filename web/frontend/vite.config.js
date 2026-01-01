@@ -22,6 +22,7 @@ const proxyOptions = {
   secure: true,
   ws: false,
 };
+console.log('proxyoptions', proxyOptions);
 
 const host = process.env.HOST
   ? process.env.HOST.replace(/https?:\/\//, "")
@@ -57,6 +58,7 @@ export default defineConfig({
     proxy: {
       "^/(\\?.*)?$": proxyOptions,
       "^/api(/|(\\?.*)?$)": proxyOptions,
+      "^/api/v1(/|(\\?.*)?$)": proxyOptions,
     },
   },
 });

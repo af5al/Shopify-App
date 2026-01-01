@@ -44,7 +44,7 @@ export default function CountdownTimerIndex() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`/api/v1/timers?id=${id}`, {
+      const res = await fetch(`/api/v1/timers/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Delete failed");

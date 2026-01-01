@@ -6,9 +6,8 @@ import express from "express";
 import serveStatic from "serve-static";
 
 import shopify from "./shopify.js";
-import productCreator from "./product-creator.js";
 import PrivacyWebhookHandlers from "./privacy.js";
-import { connectMongo } from "./mongo.js"; // <-- NEW: Mongo connection helper
+import { connectMongo } from "./mongo.js";
 import routes from "./routes/index.js";
 import storefrontTimerRoutes from "./routes/storefronttimer.routes.js";
 
@@ -22,7 +21,6 @@ const STATIC_PATH =
     ? `${process.cwd()}/frontend/dist`
     : `${process.cwd()}/frontend/`;
 
-// We’ll wrap the app setup and listen in an async function
 async function startServer() {
   // 1) Connect to MongoDB first
   await connectMongo();
@@ -43,44 +41,13 @@ async function startServer() {
   );
 
   console.log("Registering storefront timer routes at /apps/countdown-timer");
-  app.use("/", storefrontTimerRoutes); 
+  app.use("/", storefrontTimerRoutes); // comment this to work admin timer routes and uncomment while on product page to see widget in products page
 
   // If you are adding routes outside of the /api path, remember to
   // also add a proxy rule for them in web/frontend/vite.config.js
   app.use("/api/*", shopify.validateAuthenticatedSession());
 
   app.use(express.json());
-
-  // app.get("/api/products/count", async (_req, res) => {
-  //   const client = new shopify.api.clients.Graphql({
-  //     session: res.locals.shopify.session,
-  //   });
-
-  //   const countData = await client.request(`
-  //     query shopifyProductCount {
-  //       productsCount {
-  //         count
-  //       }
-  //     }
-  //   `);
-
-  //   res.status(200).send({ count: countData.data.productsCount.count });
-  // });
-
-  // app.post("/api/products", async (_req, res) => {
-  //   let status = 200;
-  //   let error = null;
-
-  //   try {
-  //     await productCreator(res.locals.shopify.session);
-  //   } catch (e) {
-  //     console.log(`Failed to process products/create: ${e.message}`);
-  //     status = 500;
-  //     error = e.message;
-  //   }
-
-  //   res.status(status).send({ success: status === 200, error });
-  // });
 
   app.use("/api/v1", routes);
 

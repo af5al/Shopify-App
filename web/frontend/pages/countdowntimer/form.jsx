@@ -13,8 +13,11 @@ import {
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 export default function CountdownTimerForm() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const id = location.state?.id;
@@ -68,7 +71,7 @@ export default function CountdownTimerForm() {
     try {
       setLoading(true);
       const res = await fetch(
-        `/api/v1/timers?id=${id}`,
+        `/api/v1/timers/${id}`,
         {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -165,7 +168,7 @@ export default function CountdownTimerForm() {
 
     try {
       const res = await fetch(
-        isEdit ? `/api/v1/timers?id=${id}` : "/api/v1/timers",
+        isEdit ? `/api/v1/timers/${id}` : "/api/v1/timers",
         {
           method: isEdit ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -210,7 +213,7 @@ const handleReset = () => {
   return (
     <Frame>
       <Page
-        title={title}
+        title={t("CountdownTimerPage.heading")}
         backAction={{ onAction: () => navigate("/countdowntimer") }}
         primaryAction={{
           content: isEdit ? "Save timer" : "Create timer",
