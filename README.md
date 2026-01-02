@@ -42,10 +42,6 @@ App is now running inside Shopify Admin.
 
 # store access to view product page with timer
 
--you can check my shopify shop on link 'products-store-9717.myshopify.com'
--password: 'shopifystore@afsal'
--there you can see the timer widget i have given on every single product view
-
 # Project Structure
 
 .
